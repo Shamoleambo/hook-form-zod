@@ -5,10 +5,20 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import './styles/global.css'
 
 const createUserFormSchema = z.object({
+  name: z
+    .string()
+    .min(5, 'Nome precisa ter no mínimo 5 caracteres')
+    .transform((name) =>
+      name
+        .trim()
+        .split(' ')
+        .map((word) => word[0].toUpperCase().concat(word.substring(1))).join(' ')
+    ),
   email: z
     .string()
     .min(1, 'E-mail é requerido')
-    .email('Formato de e-mail inválido'),
+    .email('Formato de e-mail inválido')
+    .toLowerCase(),
   password: z.string().min(6, 'A senha precisa de no mínimo 6 caracteres')
 })
 
@@ -35,6 +45,16 @@ function App() {
         className='flex flex-col gap-4 w-full max-w-xs'
         onSubmit={handleSubmit(createUser)}
       >
+        <div className='flex flex-col gap-1'>
+          <label htmlFor='name'>Nome</label>
+          <input
+            className='border border-zinc-200 shadow-sm rounded h10 px-3'
+            type='text'
+            id='name'
+            {...register('name')}
+          />
+          {errors.name && <span>{errors.name.message}</span>}
+        </div>
         <div className='flex flex-col gap-1'>
           <label htmlFor='email'>E-mail</label>
           <input
